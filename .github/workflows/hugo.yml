@@ -44,6 +44,7 @@ jobs:
         with:
           lfs: true
           submodules: recursive
+          fetch-depth: 0
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
@@ -56,6 +57,7 @@ jobs:
           HUGO_ENV: production
         run: |
           hugo \
+            --gc \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
       - name: Upload artifact

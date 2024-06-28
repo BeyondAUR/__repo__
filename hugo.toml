@@ -1,0 +1,42 @@
+baseURL = 'https://BeyondAUR.github.io/__repo__'
+languageCode = 'en-us'
+title = 'BeyondAUR'
+enableEmoji = true
+enableRobotsTXT = true
+staticDir = ['pkgs']
+
+[outputs]
+  home = ["HTML", "RSS"]
+
+[permalinks]
+  # posts = ":title"
+
+[sitemap]
+  changefreq = "weekly"
+  filename = "sitemap.xml"
+  priority = 0.5
+
+[params]
+  favicon = 'favicon.ico'
+  cover = 'cover.png'
+  description = "Tomcat0x42's personal blog"
+  [params.theme_config]
+    appearance = "dark"
+    back_home_text = ".."
+    date_format = "2006-01-02"
+
+[markup]
+  [markup.highlight]
+    anchorLineNos = false
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ''
+    hl_inline = false
+    lineAnchors = ''
+    lineNoStart = 1
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = true
+    noHl = false
+    style = 'gruvbox'
+    tabWidth = 2

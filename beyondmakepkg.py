@@ -52,6 +52,7 @@ def auto_initialize_nspawn_folder():
                 MAKEPKG_CONFIG_FILENAME,
                 nspawn_root_top,
                 "base-devel",
+                "hx-ghcup-hs",
             ],
             cwd=NSPAWN_FOLDER,
             shell=False,
@@ -81,7 +82,7 @@ def architecture_of_package(package_filename: pathlib.Path) -> str:
     _pkg_sec_idx = name.rfind(".pkg")
     _front = name[:_pkg_sec_idx]
     _last_dash_idx = _front.rfind("-")
-    _arch = _front[_last_dash_idx + 1:]
+    _arch = _front[_last_dash_idx + 1 :]
     return _arch
 
 

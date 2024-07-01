@@ -61,8 +61,28 @@ def auto_initialize_nspawn_folder():
         NSPAWN_INITIALIZED_MARKER_FILENAME.write_text("0")
 
 
+def update_nspawn_folder():
+    subprocess.run(
+        [
+            "arch-nspawn",
+            "-C",
+            PACMAN_CONFIG_FILENAME.__fspath__(),
+            "-M",
+            MAKEPKG_CONFIG_FILENAME.__fspath__(),
+            NSPAWN_FOLDER,
+            "pacman",
+            "-Syu",
+            "hx-ghcup-hs",
+            "base-devel",
+        ]
+    )
+
+
 def execute_pkgbuild(pkgbuild_top_dir: pathlib.Path) -> Iterable[pathlib.Path]:
     auto_initialize_nspawn_folder()
+    # update
+    update_nspawn_folder()
+    # build
     subprocess.run(
         [
             "makechrootpkg",
@@ -82,7 +102,7 @@ def architecture_of_package(package_filename: pathlib.Path) -> str:
     _pkg_sec_idx = name.rfind(".pkg")
     _front = name[:_pkg_sec_idx]
     _last_dash_idx = _front.rfind("-")
-    _arch = _front[_last_dash_idx + 1 :]
+    _arch = _front[_last_dash_idx + 1:]
     return _arch
 
 

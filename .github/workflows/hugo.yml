@@ -45,6 +45,10 @@ jobs:
           lfs: true
           submodules: recursive
           fetch-depth: 0
+      - name: copy README.md to content/_index.md
+        run: |
+          mkdir content
+          cp README.md content/_index.md
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

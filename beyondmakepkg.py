@@ -20,6 +20,12 @@ PACMAN_CONFIG_FILENAME = CONFIG_FOLDER.joinpath("pacman.conf")
 
 PKGS_FOLDER = PROJECT_ROOT.joinpath("pkgs")
 
+ESSENTIAL_PACKAGES = ("hx-ghcup-hs",
+                      "git",
+                      "cmake",
+                      "rsync",
+                      "base-devel",)
+
 
 @contextlib.contextmanager
 def temporary_dir_for_pkgbuild() -> Generator[pathlib.Path, None, None]:
@@ -51,9 +57,7 @@ def auto_initialize_nspawn_folder():
                 "-M",
                 MAKEPKG_CONFIG_FILENAME,
                 nspawn_root_top,
-                "base-devel",
-                "hx-ghcup-hs",
-            ],
+            ] + list(ESSENTIAL_PACKAGES),
             cwd=NSPAWN_FOLDER,
             shell=False,
             check=True,
@@ -62,20 +66,20 @@ def auto_initialize_nspawn_folder():
 
 
 def update_nspawn_folder():
-    subprocess.run(
-        [
-            "arch-nspawn",
-            "-C",
-            PACMAN_CONFIG_FILENAME.__fspath__(),
-            "-M",
-            MAKEPKG_CONFIG_FILENAME.__fspath__(),
-            NSPAWN_FOLDER,
-            "pacman",
-            "-Syu",
-            "hx-ghcup-hs",
-            "base-devel",
-        ]
-    )
+    for nspawn_top in filter(lambda x: x.is_dir(), NSPAWN_FOLDER.iterdir()):
+        subprocess.run(
+            [
+                "arch-nspawn",
+                "-C",
+                PACMAN_CONFIG_FILENAME.__fspath__(),
+                "-M",
+                MAKEPKG_CONFIG_FILENAME.__fspath__(),
+                nspawn_top,
+                "pacman",
+                "--noconfirm",
+                "-Syu"
+            ] + list(ESSENTIAL_PACKAGES)
+        )
 
 
 def execute_pkgbuild(pkgbuild_top_dir: pathlib.Path) -> Iterable[pathlib.Path]:
@@ -102,7 +106,7 @@ def architecture_of_package(package_filename: pathlib.Path) -> str:
     _pkg_sec_idx = name.rfind(".pkg")
     _front = name[:_pkg_sec_idx]
     _last_dash_idx = _front.rfind("-")
-    _arch = _front[_last_dash_idx + 1 :]
+    _arch = _front[_last_dash_idx + 1:]
     return _arch
 
 

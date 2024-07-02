@@ -21,6 +21,7 @@ PACMAN_CONFIG_FILENAME = CONFIG_FOLDER.joinpath("pacman.conf")
 PKGS_FOLDER = PROJECT_ROOT.joinpath("pkgs")
 
 ESSENTIAL_PACKAGES = ("hx-ghcup-hs",
+                      "rustup",
                       "git",
                       "cmake",
                       "rsync",

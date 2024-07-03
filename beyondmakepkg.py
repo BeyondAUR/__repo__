@@ -20,12 +20,14 @@ PACMAN_CONFIG_FILENAME = CONFIG_FOLDER.joinpath("pacman.conf")
 
 PKGS_FOLDER = PROJECT_ROOT.joinpath("pkgs")
 
-ESSENTIAL_PACKAGES = ("hx-ghcup-hs",
-                      "rustup",
-                      "git",
-                      "cmake",
-                      "rsync",
-                      "base-devel",)
+ESSENTIAL_PACKAGES = (
+    "hx-ghcup-hs",
+    "rustup",
+    "git",
+    "cmake",
+    "rsync",
+    "base-devel",
+)
 
 
 @contextlib.contextmanager
@@ -58,7 +60,8 @@ def auto_initialize_nspawn_folder():
                 "-M",
                 MAKEPKG_CONFIG_FILENAME,
                 nspawn_root_top,
-            ] + list(ESSENTIAL_PACKAGES),
+            ]
+            + list(ESSENTIAL_PACKAGES),
             cwd=NSPAWN_FOLDER,
             shell=False,
             check=True,
@@ -78,8 +81,9 @@ def update_nspawn_folder():
                 nspawn_top,
                 "pacman",
                 "--noconfirm",
-                "-Syu"
-            ] + list(ESSENTIAL_PACKAGES)
+                "-Syu",
+            ]
+            + list(ESSENTIAL_PACKAGES)
         )
 
 
@@ -107,21 +111,32 @@ def architecture_of_package(package_filename: pathlib.Path) -> str:
     _pkg_sec_idx = name.rfind(".pkg")
     _front = name[:_pkg_sec_idx]
     _last_dash_idx = _front.rfind("-")
-    _arch = _front[_last_dash_idx + 1:]
+    _arch = _front[_last_dash_idx + 1 :]
     return _arch
 
 
 def move_built_packages(package_filenames: Iterable[pathlib.Path]):
     for from_package_filename in package_filenames:
         _arch = architecture_of_package(from_package_filename)
-        to_package_filename = PKGS_FOLDER.joinpath(_arch, from_package_filename.name)
-        db_filename = PKGS_FOLDER.joinpath(_arch, "beyondaur.db.tar.gz")
-        if not to_package_filename.is_file():
-            shutil.copy(from_package_filename, to_package_filename)
-            subprocess.run(["repo-add", db_filename, to_package_filename])
-            print(f"Move {from_package_filename.name}")
+        if _arch == "any":
+            to_package_filenames = [
+                _t / from_package_filename.name
+                for _t in PKGS_FOLDER.iterdir()
+                if _t.is_dir()
+            ]
         else:
-            print(f"{from_package_filename.name} already existed in pkgs")
+            to_package_filenames = [
+                PKGS_FOLDER.joinpath(_arch, from_package_filename.name)
+            ]
+
+        for to_package_filename in to_package_filenames:
+            db_filename = to_package_filename.with_name("beyondaur.db.tar.gz")
+            if not to_package_filename.is_file():
+                shutil.copy(from_package_filename, to_package_filename)
+                subprocess.run(["repo-add", db_filename, to_package_filename])
+                print(f"Move {from_package_filename.name}")
+            else:
+                print(f"{from_package_filename.name} already existed in pkgs")
         os.unlink(from_package_filename)
 
 
